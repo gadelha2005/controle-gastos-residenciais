@@ -1,0 +1,26 @@
+# .NET
+bin/
+obj/
+*.user
+*.db
+*.db-shm
+*.db-wal
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.suo
+
+# Node / React (frontend)
+node_modules/
+dist/
+build/
+.vite/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
