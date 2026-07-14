@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using ControleGastos.Api.Data;
+using ControleGastos.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddScoped<IPessoaService, PessoaService>();
 
 var app = builder.Build();
 
