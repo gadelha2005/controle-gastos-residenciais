@@ -1,3 +1,5 @@
+namespace ControleGastos.Api.Models;
+
 public class Pessoa{
     public int Id{
         get;

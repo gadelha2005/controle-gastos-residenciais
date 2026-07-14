@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
+
 #nullable disable
 
 namespace ControleGastos.Api.Migrations
