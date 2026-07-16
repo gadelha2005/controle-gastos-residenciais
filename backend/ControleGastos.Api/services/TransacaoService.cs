@@ -18,12 +18,14 @@ public class TransacaoService : ITransacaoService {
 
         var pessoa = await _context.Pessoas.FindAsync(dto.PessoaId);
 
+        //Regra do desafio: Só é possível criar uma Transação para um usuário se ele existir.
+        //Se existir, é criada, se não retorna um erro 400.
         if (pessoa is null)
         {
             throw new RegraDeNegocioException($"Pessoa com Id {dto.PessoaId} não existe.");
         }
 
-        // Regra de negócio que menores de idade podem apenas registrar transações do tipo despesa
+        // Regra do desafio: Menores de idade podem apenas registrar transações do tipo despesa
         if (pessoa.Idade < 18 && dto.Tipo == TipoTransacao.Receita) {
             throw new RegraDeNegocioException("Menores de idade só podem registrar transações do tipo Despesa.");
         }
