@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<Transacao> Transacoes => Set<Transacao>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder){
+        //Regra do desafio: Ao deletar uma Pessoa, todas as suas Transações são apagadas automaticamente pelo banco.
+        //No código isso ocorre no on delete cascade
         modelBuilder.Entity<Transacao>()
             .HasOne(t => t.Pessoa)
             .WithMany(p => p.Transacoes)
