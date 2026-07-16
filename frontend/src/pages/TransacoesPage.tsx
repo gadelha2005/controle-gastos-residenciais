@@ -1,3 +1,137 @@
-export function TransacoesPage(){
-    return <h1 className="text-2x1 font-bold">Transações</h1>
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
+import { listarTransacoes, criarTransacao } from '../api/transacoes'
+import { listarPessoas } from '../api/pessoas'
+import { ApiError } from '../api/client'
+import { TipoTransacao } from '../types'
+import type { Transacao, Pessoa } from '../types'
+
+export function TransacoesPage() {
+
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
+  const [pessoas, setPessoas] = useState<Pessoa[]>([]);
+  const [descricao, setDescricao] = useState('');
+  const [valor, setValor] = useState('');
+  const [tipo, setTipo] = useState<TipoTransacao>(TipoTransacao.Despesa);
+  const [pessoaId, setPessoaId] = useState('');
+  const [erro, setErro] = useState<string | null>(null);
+  const [carregando, setCarregando] = useState(true);
+
+  async function carregarDados() {
+    setCarregando(true);
+    try {
+      const [listaTransacoes, listaPessoas] = await Promise.all([
+        listarTransacoes(),
+        listarPessoas(),
+      ]);
+      setTransacoes(listaTransacoes);
+      setPessoas(listaPessoas);
+    } 
+    catch (err) {
+      setErro(err instanceof ApiError ? err.message : 'Erro ao carregar dados.');
+    } 
+    finally {
+      setCarregando(false);
+    }
+  }
+
+  useEffect(() => {
+        carregarDados();
+    }, [])
+
+    async function handleSubmit(event: FormEvent) {
+        
+        event.preventDefault();
+        setErro(null);
+        setCarregando(true);
+
+        try {
+            await criarTransacao({
+                descricao,
+                valor: Number(valor),
+                tipo,
+                pessoaId: Number(pessoaId),
+            });
+
+            setDescricao('');
+            setValor('');
+            setTipo(TipoTransacao.Despesa);
+            await carregarDados();
+        } 
+        catch (err) {
+            setErro(err instanceof ApiError ? err.message : 'Erro ao criar transação.');
+            setCarregando(false);
+        }
+    }
+
+  function nomeDaPessoa(id: number) {
+    return pessoas.find((p) => p.id === id)?.nome ?? `Pessoa #${id}`;
+  }
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Transações</h1>
+
+      <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 mb-6">
+        <input
+          type="text"
+          placeholder="Descrição"
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          required
+          className="border rounded px-3 py-2 flex-1 min-w-[160px]"
+        />
+        <input
+          type="number"
+          placeholder="Valor"
+          value={valor}
+          onChange={(e) => setValor(e.target.value)}
+          required
+          min={0}
+          step="0.01"
+          className="border rounded px-3 py-2 w-28"
+        />
+        <select
+          value={tipo}
+          onChange={(e) => setTipo(Number(e.target.value) as TipoTransacao)}
+          className="border rounded px-3 py-2"
+        >
+          <option value={TipoTransacao.Despesa}>Despesa</option>
+          <option value={TipoTransacao.Receita}>Receita</option>
+        </select>
+        <select
+          value={pessoaId}
+          onChange={(e) => setPessoaId(e.target.value)}
+          required
+          className="border rounded px-3 py-2"
+        >
+          <option value="" disabled>Selecione a pessoa</option>
+          {pessoas.map((pessoa) => (
+            <option key={pessoa.id} value={pessoa.id}>{pessoa.nome}</option>
+          ))}
+        </select>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Adicionar
+        </button>
+      </form>
+
+      {erro && <p className="text-red-600 mb-4">{erro}</p>}
+
+      {carregando ? (
+        <p>Carregando...</p>
+      ) : (
+        <ul className="divide-y border rounded">
+          {transacoes.map((transacao) => (
+            <li key={transacao.id} className="flex justify-between items-center px-4 py-2">
+              <span>{transacao.descricao} — {nomeDaPessoa(transacao.pessoaId)}</span>
+              <span className={transacao.tipo === TipoTransacao.Receita ? 'text-green-600' : 'text-red-600'}>
+                {transacao.tipo === TipoTransacao.Receita ? '+' : '-'} R$ {transacao.valor.toFixed(2)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
 }
