@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ControleGastos.Api.Data;
 using ControleGastos.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
+var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
 
 // Add services to the container.
 
@@ -14,11 +15,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IPessoaService, PessoaService>();
 builder.Services.AddScoped<ITransacaoService, TransacaoService>();
 builder.Services.AddScoped<ITotalService, TotalService>();
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(frontendUrl)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -26,12 +29,10 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
