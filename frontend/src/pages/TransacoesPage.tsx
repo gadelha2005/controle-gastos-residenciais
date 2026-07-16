@@ -70,17 +70,17 @@ export function TransacoesPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Transações</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl text-text">Transações</h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 mb-6">
+      <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-card p-6 flex flex-wrap gap-3">
         <input
           type="text"
           placeholder="Descrição"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
           required
-          className="border rounded px-3 py-2 flex-1 min-w-[160px]"
+          className="bg-surface-2 border border-border rounded-card px-3 py-2 flex-1 min-w-[160px] text-text placeholder-muted outline-none focus:border-accent"
         />
         <input
           type="number"
@@ -90,12 +90,12 @@ export function TransacoesPage() {
           required
           min={0}
           step="0.01"
-          className="border rounded px-3 py-2 w-28"
+          className="bg-surface-2 border border-border rounded-card px-3 py-2 w-28 text-text placeholder-muted outline-none focus:border-accent"
         />
         <select
           value={tipo}
           onChange={(e) => setTipo(Number(e.target.value) as TipoTransacao)}
-          className="border rounded px-3 py-2"
+          className="bg-surface-2 border border-border rounded-card px-3 py-2 text-text outline-none focus:border-accent"
         >
           <option value={TipoTransacao.Despesa}>Despesa</option>
           <option value={TipoTransacao.Receita}>Receita</option>
@@ -104,28 +104,33 @@ export function TransacoesPage() {
           value={pessoaId}
           onChange={(e) => setPessoaId(e.target.value)}
           required
-          className="border rounded px-3 py-2"
+          className="bg-surface-2 border border-border rounded-card px-3 py-2 text-text outline-none focus:border-accent"
         >
           <option value="" disabled>Selecione a pessoa</option>
           {pessoas.map((pessoa) => (
             <option key={pessoa.id} value={pessoa.id}>{pessoa.nome}</option>
           ))}
         </select>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          className="bg-accent text-white font-heading font-bold rounded-card px-5 py-2.5 hover:opacity-90"
+        >
           Adicionar
         </button>
       </form>
 
-      {erro && <p className="text-red-600 mb-4">{erro}</p>}
+      {erro && <p className="text-danger text-sm">{erro}</p>}
 
       {carregando ? (
-        <p>Carregando...</p>
+        <p className="text-muted">Carregando...</p>
       ) : (
-        <ul className="divide-y border rounded">
+        <ul className="bg-surface border border-border rounded-card divide-y divide-border">
           {transacoes.map((transacao) => (
-            <li key={transacao.id} className="flex justify-between items-center px-4 py-2">
-              <span>{transacao.descricao} — {nomeDaPessoa(transacao.pessoaId)}</span>
-              <span className={transacao.tipo === TipoTransacao.Receita ? 'text-green-600' : 'text-red-600'}>
+            <li key={transacao.id} className="flex justify-between items-center px-5 py-3">
+              <span className="text-text">
+                {transacao.descricao} <span className="text-muted text-sm">— {nomeDaPessoa(transacao.pessoaId)}</span>
+              </span>
+              <span className={transacao.tipo === TipoTransacao.Receita ? 'text-success' : 'text-danger'}>
                 {transacao.tipo === TipoTransacao.Receita ? '+' : '-'} R$ {transacao.valor.toFixed(2)}
               </span>
             </li>
